@@ -108,7 +108,7 @@ fn run() -> Result<()> {
 
     loop {
         if let Err(e) = run_impl(&config.addr, &config.tag, path) {
-            eprintln!("dup ERROR: {}", e);
+            eprintln!("dup run ERROR: {}", e);
         }
 
         thread::sleep(interval);
@@ -116,8 +116,7 @@ fn run() -> Result<()> {
 }
 
 fn main() {
-    match run() {
-        Ok(()) => println!("Program completed!"),
-        Err(e) => eprintln!("{}", e),
+    if let Err(e) = run() {
+        eprintln!("dup main ERROR: {}", e);
     }
 }
