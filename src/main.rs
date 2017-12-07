@@ -104,13 +104,12 @@ fn run_impl(addr: &str, tag: &str, path: &Path) -> Result<()> {
 
 fn run() -> Result<()> {
     let config = MainConfig::from_args();
-
     let path = Path::new(&config.path);
     let interval = Duration::from_secs(config.interval);
 
     loop {
         if let Err(e) = run_impl(&config.addr, &config.tag, path) {
-            eprintln!("{}", e);
+            eprintln!("dup ERROR: {}", e);
         }
 
         thread::sleep(interval);

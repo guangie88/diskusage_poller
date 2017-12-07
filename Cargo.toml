@@ -1,6 +1,6 @@
 [package]
-name = "dup"
-version = "0.1.0"
+name = "diskusage_poller"
+version = "0.1.1"
 authors = ["Chen Weiguang <chen.weiguang@gmail.com>"]
 
 [dependencies]
@@ -17,3 +17,7 @@ structopt-derive = "=0.1.6"
 
 [features]
 default = []
+
+[[bin]]
+name = "dup"
+path = "src/main.rs"
