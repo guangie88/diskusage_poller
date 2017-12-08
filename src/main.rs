@@ -11,6 +11,7 @@ extern crate nix;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate serde_json;
 extern crate structopt;
 #[macro_use]
 extern crate structopt_derive;
@@ -71,6 +72,8 @@ struct StatvfsDef {
     fsid: c_ulong,
     flagstr: String,
     namemax: c_ulong,
+    used_prop: f32,
+    free_prop: f32,
 }
 
 impl StatvfsDef {
@@ -87,6 +90,8 @@ impl StatvfsDef {
             fsid: stat.f_fsid,
             flagstr: format!("{:?}", stat.f_flag),
             namemax: stat.f_namemax,
+            used_prop: 1.0 - (stat.f_bfree as f32 / stat.f_blocks as f32),
+            free_prop: stat.f_bfree as f32 / stat.f_blocks as f32,
         }
     }
 }
@@ -103,6 +108,10 @@ fn run_impl(addr: &str, tag: &str, path: &Path) -> Result<()> {
     Fluent::new(addr, tag)
         .post(&stat_wrap)
         .map_err(|e| -> FluentError { e.into() })?;
+
+    if cfg!(debug_assertions) {
+        println!("{}", serde_json::to_string_pretty(&stat_wrap)?);
+    }
 
     Ok(())
 }
