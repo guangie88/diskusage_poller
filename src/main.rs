@@ -43,8 +43,11 @@ type Result<T> = std::result::Result<T, Error>;
 #[structopt(name = "dup", about = "Disk Usage Poller")]
 struct MainConfig {
     #[structopt(short = "a", long = "addr",
-                default_value = "127.0.0.1:24224", help = "Fruentd hostname")]
+                default_value = "127.0.0.1:24224", help = "Fluentd hostname")]
     addr: String,
+
+    #[structopt(long = "off", help = "Turn off Fluentd logging")]
+    fluent_off: bool,
 
     #[structopt(short = "t", long = "tag",
                 help = "Tag to use for Fruentd logging")]
@@ -102,13 +105,20 @@ struct StatvfsWrap {
     statvfs: StatvfsDef,
 }
 
-fn run_impl(addr: &str, tag: &str, path: &Path) -> Result<()> {
+fn run_impl(
+    addr: &str,
+    tag: &str,
+    path: &Path,
+    fluent_off: bool,
+) -> Result<()> {
     let stat = Statvfs::for_path(path)?;
     let stat_wrap = StatvfsWrap::new(StatvfsDef::from_statvfs(&stat));
 
-    Fluent::new(addr, tag)
-        .post(&stat_wrap)
-        .map_err(|e| -> FluentError { e.into() })?;
+    if !fluent_off {
+        Fluent::new(addr, tag)
+            .post(&stat_wrap)
+            .map_err(|e| -> FluentError { e.into() })?;
+    }
 
     if cfg!(debug_assertions) {
         println!("{}", serde_json::to_string_pretty(&stat_wrap)?);
@@ -123,7 +133,9 @@ fn run() -> Result<()> {
     let interval = Duration::from_secs(config.interval);
 
     loop {
-        if let Err(e) = run_impl(&config.addr, &config.tag, path) {
+        if let Err(e) =
+            run_impl(&config.addr, &config.tag, path, config.fluent_off)
+        {
             eprintln!("dup run ERROR: {}", e);
         }
 
