@@ -72,8 +72,8 @@ struct StatvfsDef {
     fsid: c_ulong,
     flagstr: String,
     namemax: c_ulong,
-    used_prop: f32,
-    free_prop: f32,
+    used_perc: f32,
+    free_perc: f32,
 }
 
 impl StatvfsDef {
@@ -90,8 +90,9 @@ impl StatvfsDef {
             fsid: stat.f_fsid,
             flagstr: format!("{:?}", stat.f_flag),
             namemax: stat.f_namemax,
-            used_prop: 1.0 - (stat.f_bfree as f32 / stat.f_blocks as f32),
-            free_prop: stat.f_bfree as f32 / stat.f_blocks as f32,
+            used_perc: (1.0 - (stat.f_bfree as f32 / stat.f_blocks as f32))
+                * 100.0,
+            free_perc: (stat.f_bfree as f32 / stat.f_blocks as f32) * 100.0,
         }
     }
 }

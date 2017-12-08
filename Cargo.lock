@@ -154,7 +154,7 @@ dependencies = [
 
 [[package]]
 name = "diskusage_poller"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "clippy 0.0.175 (registry+https://github.com/rust-lang/crates.io-index)",
  "derive-new 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",

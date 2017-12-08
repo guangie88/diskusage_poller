@@ -1,6 +1,6 @@
 [package]
 name = "diskusage_poller"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Chen Weiguang <chen.weiguang@gmail.com>"]
 
 [dependencies]

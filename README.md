@@ -47,17 +47,21 @@ Note the program loops forever until `CTRL-C` is pressed.
 ## JSON Log Example
 
 ```json
-"statvfs": {
-  "bsize": 4096,
-  "frsize": 4096,
-  "blocks": 59699623,
-  "bfree": 36878532,
-  "bavail": 33828523,
-  "files": 15237120,
-  "ffree": 13868856,
-  "favail": 13868856,
-  "fsid": 91332353,
-  "flagstr": "RELATIME",
-  "namemax": 255
+{
+  "statvfs": {
+    "bsize": 4096,
+    "frsize": 4096,
+    "blocks": 59699623,
+    "bfree": 36610330,
+    "bavail": 33560321,
+    "files": 15237120,
+    "ffree": 14164131,
+    "favail": 14164131,
+    "fsid": 91332353,
+    "flagstr": "RELATIME",
+    "namemax": 255,
+    "used_perc": 38.675777,
+    "free_perc": 61.324223
+  }
 }
 ```
