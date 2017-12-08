@@ -47,7 +47,7 @@ Note the program loops forever until `CTRL-C` is pressed.
 ## JSON Log Example
 
 ```json
-{
+"statvfs": {
   "bsize": 4096,
   "frsize": 4096,
   "blocks": 59699623,

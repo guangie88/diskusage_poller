@@ -3,13 +3,14 @@
 #![cfg_attr(feature = "clippy", deny(warnings))]
 
 #[macro_use]
+extern crate derive_new;
+#[macro_use]
 extern crate failure;
 extern crate fruently;
 extern crate nix;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde_json;
 extern crate structopt;
 #[macro_use]
 extern crate structopt_derive;
@@ -18,6 +19,7 @@ use failure::Error;
 use fruently::fluent::Fluent;
 use fruently::forwardable::JsonForwardable;
 use nix::sys::statvfs::vfs::Statvfs;
+use std::os::raw::c_ulong;
 use std::path::Path;
 use std::thread;
 use std::time::Duration;
@@ -57,23 +59,23 @@ struct MainConfig {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct SerStatvfs {
-    bsize: u64,
-    frsize: u64,
+struct StatvfsDef {
+    bsize: c_ulong,
+    frsize: c_ulong,
     blocks: u64,
     bfree: u64,
     bavail: u64,
     files: u64,
     ffree: u64,
     favail: u64,
-    fsid: u64,
+    fsid: c_ulong,
     flagstr: String,
-    namemax: u64,
+    namemax: c_ulong,
 }
 
-impl SerStatvfs {
-    fn from_statvfs(stat: &Statvfs) -> SerStatvfs {
-        SerStatvfs {
+impl StatvfsDef {
+    fn from_statvfs(stat: &Statvfs) -> StatvfsDef {
+        StatvfsDef {
             bsize: stat.f_bsize,
             frsize: stat.f_frsize,
             blocks: stat.f_blocks,
@@ -89,13 +91,17 @@ impl SerStatvfs {
     }
 }
 
-fn run_impl(addr: &str, tag: &str, path: &Path) -> Result<()> {
-    let fluent = Fluent::new(addr, tag);
-    let stat = Statvfs::for_path(path)?;
-    let ser_stat = SerStatvfs::from_statvfs(&stat);
+#[derive(Serialize, Deserialize, Debug, new)]
+struct StatvfsWrap {
+    statvfs: StatvfsDef,
+}
 
-    fluent
-        .post(&ser_stat)
+fn run_impl(addr: &str, tag: &str, path: &Path) -> Result<()> {
+    let stat = Statvfs::for_path(path)?;
+    let stat_wrap = StatvfsWrap::new(StatvfsDef::from_statvfs(&stat));
+
+    Fluent::new(addr, tag)
+        .post(&stat_wrap)
         .map_err(|e| -> FluentError { e.into() })?;
 
     Ok(())
