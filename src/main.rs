@@ -7,6 +7,7 @@ extern crate derive_new;
 #[macro_use]
 extern crate failure;
 extern crate fruently;
+extern crate humantime;
 extern crate nix;
 extern crate serde;
 #[macro_use]
@@ -19,11 +20,11 @@ extern crate structopt_derive;
 use failure::Error;
 use fruently::fluent::Fluent;
 use fruently::forwardable::JsonForwardable;
+use humantime::Duration;
 use nix::sys::statvfs::vfs::Statvfs;
 use std::os::raw::c_ulong;
 use std::path::Path;
 use std::thread;
-use std::time::Duration;
 use structopt::StructOpt;
 
 #[derive(Debug, Fail)]
@@ -58,8 +59,8 @@ struct MainConfig {
     path: String,
 
     #[structopt(parse(try_from_str), short = "i", long = "interval",
-                help = "Interval in seconds")]
-    interval: u64,
+                help = "Interval to get disk usage")]
+    interval: Duration,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -130,7 +131,6 @@ fn run_impl(
 fn run() -> Result<()> {
     let config = MainConfig::from_args();
     let path = Path::new(&config.path);
-    let interval = Duration::from_secs(config.interval);
 
     loop {
         if let Err(e) =
@@ -139,7 +139,7 @@ fn run() -> Result<()> {
             eprintln!("dup run ERROR: {}", e);
         }
 
-        thread::sleep(interval);
+        thread::sleep(*config.interval);
     }
 }
 

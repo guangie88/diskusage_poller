@@ -39,7 +39,7 @@ Polls for:
 * `Fluentd` tag: `elastic.rs`
 
 ```bash
-./target/x86_64-unknown-linux-musl/release/dup -i 5 -p / -t elastic.rs
+./target/x86_64-unknown-linux-musl/release/dup -i 5s -p / -t elastic.rs
 ```
 
 Note the program loops forever until `CTRL-C` is pressed.
