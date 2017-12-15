@@ -1,5 +1,7 @@
 # diskusage_poller
 
+This is an experimental project.
+
 Polls for storage usage (include `inode` usage) on file system via the Linux
 system call [`statvfs`](http://man7.org/linux/man-pages/man3/statvfs.3.html) for
 `Rust`, to `Fluentd` unified logging layer.
