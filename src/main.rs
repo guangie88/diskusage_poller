@@ -4,7 +4,6 @@
 
 #[macro_use]
 extern crate derive_new;
-#[macro_use]
 extern crate failure;
 extern crate fruently;
 extern crate humantime;
@@ -26,17 +25,6 @@ use std::os::raw::c_ulong;
 use std::path::Path;
 use std::thread;
 use structopt::StructOpt;
-
-#[derive(Debug, Fail)]
-enum FluentError {
-    #[fail(display = "")] InnerFluentError { e: fruently::error::FluentError },
-}
-
-impl From<fruently::error::FluentError> for FluentError {
-    fn from(e: fruently::error::FluentError) -> FluentError {
-        FluentError::InnerFluentError { e: e }
-    }
-}
 
 type Result<T> = std::result::Result<T, Error>;
 
@@ -116,9 +104,7 @@ fn run_impl(
     let stat_wrap = StatvfsWrap::new(StatvfsDef::from_statvfs(&stat));
 
     if !fluent_off {
-        Fluent::new(addr, tag)
-            .post(&stat_wrap)
-            .map_err(|e| -> FluentError { e.into() })?;
+        Fluent::new(addr, tag).post(&stat_wrap)?;
     }
 
     if cfg!(debug_assertions) {
